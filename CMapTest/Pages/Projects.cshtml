@@ -1,0 +1,50 @@
+﻿@page
+@using CMapTest.Models
+@model CMapTest.Pages.ProjectsModel
+@{
+    ViewData["Title"] = "Projects";
+}
+
+<p>Projects: <button class="btn" data-bs-toggle="modal" data-bs-target="#add-project-model">Add</button></p>
+@{
+    var projects = await Model.GetAllProjects();
+    if (projects.Any())
+    {
+        <div>
+            @foreach (Project project in projects)
+            {
+                <p>@project.Name</p>
+            }
+        </div>
+    }
+    else
+    {
+        <p>No Projects found please create a Project</p>
+    }
+}
+
+<div class="modal" tabindex="-1" id="add-project-model">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Product Details</h5>
+            </div>
+            <div class="modal-body">
+                <form method="post" >
+                    <div>
+                        <lable for="projName">@nameof(Project.Name)</lable>
+                        <input type="text" id="projName" name="@nameof(Project.Name)" />
+                    </div>
+                    <div>
+                        <lable for="projDesc">@nameof(Project.Description)</lable>
+                        <input type="text" id="projDesc" name="@nameof(Project.Description)" />
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" asp-page-handler="AddProject">Add</button>
+                        <button class="btn btn-secondary" type="reset" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

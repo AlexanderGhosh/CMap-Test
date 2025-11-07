@@ -1,0 +1,24 @@
+﻿@page
+@using CMapTest.Models
+@model CMapTest.Pages.EntriesModel
+@{
+    ViewData["Title"] = "Entries";
+}
+
+<div>Hello i am entries</div>
+@{
+    var projects = await Model.GetAllProjects();
+    if (projects.Any())
+    {
+        <select name="Project">
+            @foreach (Project project in projects)
+            {
+                <option value="project">project.Name</option>
+            }
+        </select>
+    }
+    else
+    {
+        <p>No Projects found please create a Project <a>here</a></p>
+    }
+}

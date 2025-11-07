@@ -8,7 +8,7 @@ namespace CMapTest.Models
     public sealed class Entry
     {
         [Required]
-        public required int EntryId { get; init; }
+        public required int Id { get; set; }
         [Required]
         public required int UserId { get; init; }
         [Required]

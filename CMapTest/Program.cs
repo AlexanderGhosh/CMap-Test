@@ -1,3 +1,5 @@
+using CMapTest.Data;
+
 namespace CMapTest
 {
     public class Program
@@ -8,6 +10,7 @@ namespace CMapTest
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+            builder.Services.AddSingleton<IDataLayer, DataLayer>();
 
             var app = builder.Build();
 
