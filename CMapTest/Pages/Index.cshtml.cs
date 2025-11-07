@@ -1,20 +1,16 @@
+using CMapTest.Data;
+using CMapTest.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace CMapTest.Pages
 {
-    public class IndexModel : PageModel
+    public class IndexModel(IDataLayer _dataLayer) : PageModel
     {
-        private readonly ILogger<IndexModel> _logger;
-
-        public IndexModel(ILogger<IndexModel> logger)
+        public async Task<IActionResult> OnPostLogin(LoginRequest request, CancellationToken cancellationToken)
         {
-            _logger = logger;
-        }
-
-        public void OnGet()
-        {
-
+            await _dataLayer.LoginUser(request, default);
+            return Redirect(Request.Path);
         }
     }
 }

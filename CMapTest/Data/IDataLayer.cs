@@ -13,5 +13,7 @@ namespace CMapTest.Data
 
         Task<Entry> CreateEntry(Entry entry, CancellationToken cancellationToken);
         Task<Project> CreateProject(Project project, CancellationToken cancellationToken);
+
+        Task<User> LoginUser(LoginRequest loginRequest, CancellationToken cancellationToken);
     }
 }

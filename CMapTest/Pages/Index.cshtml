@@ -1,4 +1,6 @@
 ﻿@page
+@using CMapTest.Models
+@addTagHelper *, CMapTest
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
@@ -6,5 +8,11 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <p>Please Login</p>
+    <form method="post">
+        <label for="username">@nameof(LoginRequest.Username)</label>
+        <input type="text" name="@nameof(LoginRequest.Username)" id="@nameof(LoginRequest.Username)" />
+        <input type="password" name="@nameof(LoginRequest.Password)" id="@nameof(LoginRequest.Password)" />
+        <button class="btn btn-primary" asp-page-handler="Login">Login</button>
+    </form>
 </div>

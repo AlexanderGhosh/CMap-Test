@@ -10,7 +10,10 @@ namespace CMapTest
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+            // this line is commented out because im happy with the defaults
+            // builder.Services.Configure<PasswordOptions>(builder.Configuration.GetRequiredSection("PasswordConfig"));
             builder.Services.AddSingleton<IDataLayer, DataLayer>();
+            builder.Services.AddSingleton<IAuthService, AuthService>();
 
             var app = builder.Build();
 

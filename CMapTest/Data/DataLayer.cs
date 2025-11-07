@@ -6,8 +6,9 @@ namespace CMapTest.Data
 {
     // at work the data layer tends to call funcs from an other class for the DB work but in this case beacuse in mem storage is so simple im not gonna do that
     // but if i were in this case i would have some kind of IDataStorage which could be swapped for a DB implementation
-    public sealed class DataLayer : IDataLayer
+    public sealed class DataLayer(IAuthService _auth) : IDataLayer
     {
+        private readonly ConcurrentDictionary<string, AuthUser> _authUsers = [];
         private readonly ConcurrentDictionary<int, User> _users = [];
         private readonly ConcurrentDictionary<int, Project> _projects = [];
         private readonly ConcurrentDictionary<int, Entry> _entries = [];
@@ -47,6 +48,19 @@ namespace CMapTest.Data
             project.Id = nextId(_projects);
             _projects.TryAdd(project.Id, project);
             return Task.FromResult(project);
+        }
+
+        public Task<User> LoginUser(LoginRequest loginRequest, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!_authUsers.TryGetValue(loginRequest.Username, out AuthUser? authUser))
+                throw new OperationFailedException("Username not found");
+
+            _auth.VerifyPassword(loginRequest.Password, authUser.Password, cancellationToken);
+
+            if (!_users.TryGetValue(authUser.UserId, out User? user))
+                throw new Exception("Data corruption exception: Auth User exists but there is not corresponding User");
+            return Task.FromResult(user);
         }
 
 
