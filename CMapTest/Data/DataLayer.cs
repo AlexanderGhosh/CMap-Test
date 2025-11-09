@@ -25,17 +25,11 @@ namespace CMapTest.Data
                 FirstName = "test user 1",
                 LastName = "test user 1"
             });
-            _authUsers.TryAdd("test", new AuthUser()
+            _authUsers.TryAdd("admin", new AuthUser()
             {
                 UserId = 0,
-                Username = "test",
+                Username = "admin",
                 Password = _auth.GeneratePasswordHash("test", default).Result
-            });
-            _userClaims.Add(new UserClaim()
-            {
-                UserId = 0,
-                Type = ClaimTypes.Name,
-                Value = "Alexander Ghosh"
             });
             _userClaims.Add(new UserClaim()
             {
@@ -48,6 +42,24 @@ namespace CMapTest.Data
                 UserId = 0,
                 Type = ClaimTypes.UserRole,
                 Value = UserRole.Admin.ToString()
+            });
+            _authUsers.TryAdd("test 1", new AuthUser()
+            {
+                UserId = 1,
+                Username = "test 1",
+                Password = _auth.GeneratePasswordHash("test 1", default).Result
+            });
+            _userClaims.Add(new UserClaim()
+            {
+                UserId = 1,
+                Type = ClaimTypes.UserId,
+                Value = "1"
+            });
+            _userClaims.Add(new UserClaim()
+            {
+                UserId = 0,
+                Type = ClaimTypes.UserRole,
+                Value = UserRole.User.ToString()
             });
             _projects.TryAdd(0, new()
             {

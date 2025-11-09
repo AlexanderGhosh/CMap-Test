@@ -1,12 +1,14 @@
 using CMapTest.Data;
 using CMapTest.Exceptions;
 using CMapTest.Reports;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CMapTest.Pages
 {
+    [Authorize(Policy = Policies.Admin)]
     public class ReportsModel(IReportGenerator _reports, IUserDataLayer _users) : PageModel
     {
         public SelectList SelectableUsers { get; set; }
