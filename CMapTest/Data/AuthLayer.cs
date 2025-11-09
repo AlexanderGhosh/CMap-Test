@@ -1,6 +1,7 @@
 ﻿using CMapTest.Auth;
 using CMapTest.Exceptions;
 using CMapTest.Models;
+using CMapTest.Utils;
 using System.Collections.Concurrent;
 using System.Security.Claims;
 
@@ -11,17 +12,18 @@ namespace CMapTest.Data
         private readonly IAuthService _auth = _services.GetRequiredService<IAuthService>();
         private readonly ConcurrentDictionary<string, AuthUser> _authUsers = [];
         private readonly ConcurrentBag<UserClaim> _userClaims = [];
-        public Task<User> LoginUser(LoginRequest loginRequest, CancellationToken cancellationToken)
+        public async Task<User> LoginUser(LoginRequest loginRequest, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (!_authUsers.TryGetValue(loginRequest.Username, out AuthUser? authUser))
                 throw new OperationFailedException("Username not found");
 
-            _auth.VerifyPassword(loginRequest.Password, authUser.Password, cancellationToken);
+            if (!await _auth.VerifyPassword(loginRequest.Password, authUser.Password, cancellationToken))
+                throw new Exception("Password does not match");
 
             if (!_users.TryGetValue(authUser.UserId, out User? user))
                 throw new Exception("Data corruption exception: Auth User exists but there is not corresponding User");
-            return Task.FromResult(user);
+            return user;
         }
 
         public Task<IEnumerable<Claim>> GetUserClaims(int userId, CancellationToken cancellationToken)
@@ -54,6 +56,8 @@ namespace CMapTest.Data
                 Username = signup.Username,
                 Password = await _auth.GeneratePasswordHash(signup.Password, default)
             };
+            _authUsers.TryAdd(authUser.Username, authUser);
+            _userClaims.Add(new UserClaim() { Type = ClaimTypes.UserId, Value = authUser.UserId.ToString(), UserId = authUser.UserId });
             return u;
         }
     }

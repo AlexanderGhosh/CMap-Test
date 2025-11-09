@@ -31,7 +31,9 @@ namespace CMapTest.Auth
         public Task<bool> VerifyPassword(string plainPassword, byte[] exceptedHash, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            byte[] genHash = hashText(plainPassword);
+            byte[] salt = new byte[_config.SaltLength];
+            Buffer.BlockCopy(exceptedHash, 0, salt, 0, _config.SaltLength);
+            byte[] genHash = hashText(plainPassword, salt);
             return Task.FromResult(bitWiseComparison(exceptedHash, genHash));
         }
 
@@ -46,10 +48,8 @@ namespace CMapTest.Auth
 
         private byte[] getPasswordBytes(string plainText) => Encoding.UTF8.GetBytes(plainText);
 
-        private byte[] hashText(string plain)
+        private byte[] hashText(string plain, byte[] salt)
         {
-            using MD5 hasher = MD5.Create();
-            byte[] salt = getSalt();
             byte[] plainBytes = getPasswordBytes(plain);
             return generateSecureBytes(plainBytes, salt);
         }
