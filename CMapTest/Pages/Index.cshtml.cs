@@ -11,6 +11,8 @@ namespace CMapTest.Pages
 {
     public class IndexModel(IAuthDataLayer _authData) : PageModel
     {
+        [BindProperty]
+        public SignupUser Signup { get; set; } = new();
         public async Task<IActionResult> OnPostLogin(LoginRequest request, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -30,19 +32,19 @@ namespace CMapTest.Pages
             }
         }
 
-        public async Task<IActionResult> OnPostSignup(SignupUser signup, CancellationToken cancellationToken)
+        public async Task<IActionResult> OnPostSignup(CancellationToken cancellationToken)
         {
+            if (!ModelState.IsValid) return Redirect(Request.Path);
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                await _authData.SignUpUser(signup, cancellationToken);
+                await _authData.SignUpUser(Signup, cancellationToken);
                 return Redirect("/User");
             }
             catch (OperationFailedException)
             {
                 return Redirect(Request.Path);
             }
-
         }
     }
 }

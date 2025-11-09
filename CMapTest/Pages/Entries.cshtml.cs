@@ -40,7 +40,7 @@ namespace CMapTest.Pages
         public async Task<IActionResult> OnPostRemoveEntry(int? entryId)
         {
             if (entryId is not null)
-                await _projects.RemoveProject(entryId.Value, default);
+                await _entries.RemoveEntry(entryId.Value, default);
             return await OnGetAsync();
         }
 

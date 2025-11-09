@@ -50,6 +50,12 @@ namespace CMapTest.Pages
             await _entries.CreateEntry(NewEntry, cancellationToken);
             return await OnGetAsync(null, cancellationToken);
         }
+        public async Task<IActionResult> OnPostRemoveEntry(int? entryId)
+        {
+            if (entryId is not null)
+                await _entries.RemoveEntry(entryId.Value, default);
+            return await OnGetAsync(null, default);
+        }
 
         public async Task<IActionResult> OnPostSearch(EntrySearchContext search)
         {

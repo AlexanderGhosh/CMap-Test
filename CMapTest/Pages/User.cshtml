@@ -67,6 +67,12 @@
                         <td>@Html.DisplayFor(m => entryPretty.Date)</td>
                         <td>@Html.DisplayFor(m => entryPretty.WorkingPeriod)</td>
                         <td>@Html.DisplayFor(m => entryPretty.Description)</td>
+                        <td>
+                            <form method="post">
+                                <input type="hidden" name="entryId" id="entryId" value="@entryPretty.Id" />
+                                <button type="submit" asp-page-handler="RemoveEntry">Remove</button>
+                            </form>
+                        </td>
                     </tr>
                 }
             </table>

@@ -14,5 +14,56 @@
         <input type="text" name="@nameof(LoginRequest.Username)" id="@nameof(LoginRequest.Username)" />
         <input type="password" name="@nameof(LoginRequest.Password)" id="@nameof(LoginRequest.Password)" />
         <button class="btn btn-primary" asp-page-handler="Login">Login</button>
+        <div>
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#sigup-modal">Signup</button>
+        </div>
     </form>
+</div>
+
+<div class="modal" tabindex="-1" id="sigup-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Entry Details</h5>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    <div>
+                        <label asp-for="Signup.Username" class="control-label">User Name</label>
+                        <input type="text" asp-for="Signup.Username" value="" class="form-control" />
+                        <span asp-validation-for="Signup.Username" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Signup.FirstName" class="control-label">First Name</label>
+                        <input type="text" asp-for="Signup.FirstName" value="" class="form-control" />
+                        <span asp-validation-for="Signup.FirstName" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Signup.LastName" class="control-label">Last Name</label>
+                        <input type="text" asp-for="Signup.LastName" value="" class="form-control" />
+                        <span asp-validation-for="Signup.LastName" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Signup.OtherNames" class="control-label">Other Names</label>
+                        <input type="text" asp-for="Signup.OtherNames" value="" class="form-control" />
+                        <span asp-validation-for="Signup.OtherNames" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Signup.PreferredName" class="control-label">Preferred Name</label>
+                        <input type="text" asp-for="Signup.PreferredName" value="" class="form-control" />
+                    </div>
+                    <div>
+                        <label asp-for="Signup.Password" class="control-label">Password</label>
+                        <input type="password" asp-for="Signup.Password" value="" class="form-control" />
+                        <span asp-validation-for="Signup.Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" asp-page-handler="SignUp">Add</button>
+                        <button class="btn btn-secondary" type="reset" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
