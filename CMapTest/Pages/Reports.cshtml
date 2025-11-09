@@ -1,0 +1,35 @@
+﻿@page
+@model CMapTest.Pages.ReportsModel
+@{
+}
+
+<div>
+    <h1>Reports</h1>
+    <form method="post" asp-page-handler="UserReport">
+@*         <div>
+            <label asp-for="NewEntry.ProjectId" class="control-label">Project</label>
+            <select asp-for="ReportType" asp-items="Html.GetEnumSelectList<ReportType>()">
+                <option value="">Choose a day</option>
+            </select>
+            <span asp-validation-for="NewEntry.ProjectId" class="text-danger"></span>
+        </div> *@
+        <div>
+            <label for="userId" class="control-label">Project</label>
+            <select name="userId" itemid="userId" asp-items="Model.SelectableUsers" class="form-control-sm">
+                <option value="">Choose a User</option>
+            </select>
+            <span class="field-validation-valid text-danger"
+                  data-valmsg-for="userId"
+                  data-valmsg-replace="true"></span>
+        </div>
+        <div>
+            <label for="startDate" id="startDate" class="control-label">Start Date</label>
+            <input type="date" name="startDate" id="startDate" class="form-control-sm" />
+        </div>
+        <div>
+            <label for="endDate" id="endDate" class="control-label">End Date</label>
+            <input type="date" name="endDate" id="endDate" class="form-control-sm" />
+        </div>
+        <button class="btn btn-primary">Generate</button>
+    </form>
+</div>

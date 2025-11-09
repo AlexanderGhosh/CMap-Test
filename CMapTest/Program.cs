@@ -34,6 +34,7 @@ namespace CMapTest
             builder.Services.AddSingleton<IEntriesDataLayer>(s => s.GetRequiredService<DataLayer>());
 
             builder.Services.AddSingleton<IAuthService, AuthService>();
+            builder.Services.AddSingleton<IReportGenerator, ReportGenerator>();
 
             var app = builder.Build();
 

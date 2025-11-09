@@ -66,7 +66,8 @@ namespace CMapTest.Data
                 ProjectName = p.Name,
                 Description = e.Description,
                 UserId = e.UserId,
-                ProjectId = e.ProjectId
+                ProjectId = e.ProjectId,
+                WorkingPeriodRaw = e.TimeWorked
             };
         }
 

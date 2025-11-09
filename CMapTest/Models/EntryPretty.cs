@@ -9,6 +9,7 @@
         public string ProjectName { get; set; }
         public DateOnly Date { get; set; }
         public string WorkingPeriod { get; set; }
+        public TimeSpan WorkingPeriodRaw { get; set; }
         public string? Description { get; set; }
     }
 }
