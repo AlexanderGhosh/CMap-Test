@@ -1,4 +1,7 @@
+using CMapTest.Auth;
+using CMapTest.Config;
 using CMapTest.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace CMapTest
 {
@@ -8,17 +11,32 @@ namespace CMapTest
         {
             var builder = WebApplication.CreateBuilder(args);
 
+
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(o =>
+            {
+                o.LoginPath = new PathString("/Error"); // caused redirect to login page
+                AuthOptions authOpt = builder.Configuration.GetRequiredSection("AuthOptions").Get<AuthOptions>()!;
+                o.Cookie.Name = CookieAuthenticationDefaults.AuthenticationScheme;
+                o.ExpireTimeSpan = authOpt.CookieExpiry;
+                o.Validate();
+            });
+            builder.Services.AddAuthorization();
             // Add services to the container.
             builder.Services.AddRazorPages();
-            // this line is commented out because im happy with the defaults
-            // builder.Services.Configure<PasswordOptions>(builder.Configuration.GetRequiredSection("PasswordConfig"));
+            builder.Services.Configure<AuthOptions>(builder.Configuration.GetRequiredSection("AuthOptions"));
             builder.Services.AddSingleton<IDataLayer, DataLayer>();
             builder.Services.AddSingleton<IAuthService, AuthService>();
 
             var app = builder.Build();
 
+            if (builder.Environment.IsDevelopment())
+            {
+                // seeding
+                IDataLayer data = app.Services.GetRequiredService<IDataLayer>();
+                data.Seed();
+            }
             // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
+            else
             {
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
@@ -30,6 +48,7 @@ namespace CMapTest
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapRazorPages();

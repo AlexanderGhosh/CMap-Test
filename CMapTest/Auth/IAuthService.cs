@@ -1,9 +1,10 @@
-﻿namespace CMapTest
+﻿namespace CMapTest.Auth
 {
     public interface IAuthService
     {
         Task<bool> VerifyPassword(string plainPassword, byte[] exceptedHash, CancellationToken cancellationToken);
         Task<PasswordStrengthResult> IsPasswordStrongEnough(string plainPassword, CancellationToken cancellationToken);
+        Task<byte[]> GeneratePasswordHash(string plainPassword, CancellationToken cancellationToken);
     }
     public sealed class PasswordStrengthResult
     {

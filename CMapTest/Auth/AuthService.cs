@@ -3,16 +3,17 @@ using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace CMapTest
+namespace CMapTest.Auth
 {
-    public sealed class AuthService(IOptionsMonitor<PasswordOptions> options) : IAuthService
+    public sealed class AuthService(IOptionsMonitor<AuthOptions> options) : IAuthService
     {
-        // i know this defaults to the named options "". I dont think its likely that a dev would add multiple PasswordOptions options and at some point its not worth accounting for dev error
-        private PasswordOptions _config => options.CurrentValue;
+        // i know this defaults to the named option "". I dont think its likely that a dev would add multiple PasswordOptions options and at some point its not worth accounting for dev error
+        private AuthOptions _config => options.CurrentValue;
         // at work i wrote a similar function to return a list of all the errors but i felt that it was a valid compromise to not do that so i can get this project done faster
         // it would take more time to manage multiple fail reasons at once because i would have to make a component to present them nicely which can be a can of worms
         public async Task<PasswordStrengthResult> IsPasswordStrongEnough(string plainPassword, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             await Task.Yield();
             if (!_config.PasswordLength.InRange(plainPassword.Length))
                 return PasswordStrengthResult.Fail($"Your password's length must be in the range: {_config.PasswordLength}");
@@ -22,7 +23,7 @@ namespace CMapTest
                 return PasswordStrengthResult.Fail($"Your password's upper case characters must be in the range: {_config.PasswordUpperCase}");
             if (!_config.PasswordDigits.InRange(plainPassword.Count(char.IsDigit)))
                 return PasswordStrengthResult.Fail($"Your password must contains a number of digits in the range: {_config.PasswordDigits}");
-            if (!_config.AllowNonAlphaNumberic && plainPassword.All(char.IsLetterOrDigit))
+            if (!_config.AllowNonAlphaNumeric && plainPassword.All(char.IsLetterOrDigit))
                 return PasswordStrengthResult.Fail($"Your password must only contains a letters or numerical digits");
             return PasswordStrengthResult.Pass();
         }
@@ -30,11 +31,17 @@ namespace CMapTest
         public Task<bool> VerifyPassword(string plainPassword, byte[] exceptedHash, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            byte[] password = getPasswordBytes(plainPassword);
-            byte[] salt = new byte[_config.SaltLength];
-            Buffer.BlockCopy(exceptedHash, 0, salt, 0, _config.SaltLength);
-            byte[] genHash = generateSecureBytes(password, salt);
+            byte[] genHash = hashText(plainPassword);
             return Task.FromResult(bitWiseComparison(exceptedHash, genHash));
+        }
+
+        public Task<byte[]> GeneratePasswordHash(string plainPassword, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            byte[] password = getPasswordBytes(plainPassword);
+            byte[] salt = getSalt();
+            byte[] genHash = generateSecureBytes(password, salt);
+            return Task.FromResult(genHash);
         }
 
         private byte[] getPasswordBytes(string plainText) => Encoding.UTF8.GetBytes(plainText);

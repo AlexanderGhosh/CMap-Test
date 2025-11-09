@@ -1,26 +1,24 @@
-﻿using CMapTest.Exceptions;
+﻿using CMapTest.Auth;
+using CMapTest.Config;
+using CMapTest.Exceptions;
 using CMapTest.Models;
+using CMapTest.Utils;
+using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
+using System.Security.Claims;
 
 namespace CMapTest.Data
 {
     // at work the data layer tends to call funcs from an other class for the DB work but in this case beacuse in mem storage is so simple im not gonna do that
     // but if i were in this case i would have some kind of IDataStorage which could be swapped for a DB implementation
-    public sealed class DataLayer(IAuthService _auth) : IDataLayer
+    public sealed class DataLayer(IAuthService _auth, IOptionsMonitor<AuthOptions> options) : IDataLayer
     {
         private readonly ConcurrentDictionary<string, AuthUser> _authUsers = [];
         private readonly ConcurrentDictionary<int, User> _users = [];
         private readonly ConcurrentDictionary<int, Project> _projects = [];
         private readonly ConcurrentDictionary<int, Entry> _entries = [];
-        public Task<Entry> CreateEntry(Entry entry, CancellationToken cancellationToken)
-        {
-            assertUserExists(entry.UserId);
-            assertProjectExists(entry.ProjectId);
-            if (isDuplicateEntry(entry)) throw new OperationFailedException("Cannot add duplicate entries");
-            entry.Id = nextId(_entries); // assigned to variable so i can debug easier if needed
-            _entries.TryAdd(entry.Id, entry);
-            return Task.FromResult(entry);
-        }
+        private readonly ConcurrentBag<UserClaim> _userClaims = [];
+        private AuthOptions _config => options.CurrentValue;
 
         public Task<Entry> GetEntryFromId(int id, CancellationToken cancellationToken)
         {
@@ -49,6 +47,12 @@ namespace CMapTest.Data
             _projects.TryAdd(project.Id, project);
             return Task.FromResult(project);
         }
+        public Task<User> CreateUser(User user, CancellationToken cancellationToken)
+        {
+            user.Id = nextId(_users);
+            _users.TryAdd(user.Id, user);
+            return Task.FromResult(user);
+        }
 
         public Task<User> LoginUser(LoginRequest loginRequest, CancellationToken cancellationToken)
         {
@@ -61,6 +65,83 @@ namespace CMapTest.Data
             if (!_users.TryGetValue(authUser.UserId, out User? user))
                 throw new Exception("Data corruption exception: Auth User exists but there is not corresponding User");
             return Task.FromResult(user);
+        }
+
+        public Task<IEnumerable<Claim>> GetUserClaims(int userId, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            assertUserExists(userId);
+            return Task.FromResult(_userClaims.Where(c => c.UserId == userId).Select(c => new Claim(c.Type, c.Value)));
+        }
+        //Task.FromResult<IEnumerable<Claim>>([
+        //    new Claim(ClaimTypes.Name, "Alexander Khumar Ghosh", null, _config.AuthenticationIssuer)
+        //]);
+
+        public async Task<User> SignUpUser(SignupUser signup, CancellationToken cancellationToken)
+        {
+            if (_authUsers.Any(kvp => kvp.Value.Username == signup.Username)) throw new OperationFailedException("That username is in use");
+            var res = await _auth.IsPasswordStrongEnough(signup.Password, cancellationToken);
+            if (!res.IsAdequate) throw new OperationFailedException($"Password does not meet the following criteria: {(res.FailedReason ?? "Unknown")}");
+            User u = new()
+            {
+                Id = nextId(_users),
+                FirstName = signup.FirstName,
+                LastName = signup.LastName,
+                OtherNames = signup.OtherNames,
+                PreferredName = signup.PreferredName
+            };
+            await CreateUser(u, default);
+            AuthUser authUser = new()
+            {
+                UserId = u.Id,
+                Username = signup.Username,
+                Password = await _auth.GeneratePasswordHash(signup.Password, default)
+            };
+            return u;
+        }
+
+        public void Seed()
+        {
+            _users.TryAdd(0, new User()
+            {
+                Id = 0,
+                FirstName = "test",
+                LastName = "test"
+            });
+            _authUsers.TryAdd("test", new AuthUser()
+            {
+                UserId = 0,
+                Username = "test",
+                Password = _auth.GeneratePasswordHash("test", default).Result
+            });
+            _userClaims.Add(new UserClaim()
+            {
+                UserId = 0,
+                Type = ClaimTypes.Name,
+                Value = "Alexander Ghosh"
+            });
+            _userClaims.Add(new UserClaim()
+            {
+                UserId = 0,
+                Type = ClaimTypes.UserId,
+                Value = "0"
+            });
+            _projects.TryAdd(0, new()
+            {
+                Id = 0,
+                Name = "testProject",
+                Enabled = true,
+            });
+            _entries.TryAdd(0, new()
+            {
+                Id = 0,
+                UserId = 0,
+                ProjectId = 0,
+                Date = DateTime.Today,
+                StartTime = new TimeOnly(0, 0),
+                EndTime = new TimeOnly(1, 0),
+                Description = "test entry description"
+            });
         }
 
 

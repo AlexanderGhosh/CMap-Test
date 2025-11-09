@@ -6,7 +6,7 @@ namespace CMapTest.Models
     {
         [Required(AllowEmptyStrings = false)]
         public required string Username { get; init; }
-        [Required(AllowEmptyStrings = false)]
+        [Required(AllowEmptyStrings = false), DataType(DataType.Password)]
         public required string Password { get; init; }
     }
 }
