@@ -7,27 +7,43 @@
 
 <p>Projects: <button class="btn" data-bs-toggle="modal" data-bs-target="#add-project-model">Add</button></p>
 @{
-    var projects = await Model.GetAllProjects();
-    if (projects.Any())
+    if (Model.Projects.Any())
     {
-        <div>
-            @foreach (Project project in projects)
+        <table class="table">
+            <tr>
+                <th> @Html.DisplayNameFor(model => Model.Projects.First().Name)</th>
+                <th> @Html.DisplayNameFor(model => Model.Projects.First().Description)</th>
+                <th> @Html.DisplayNameFor(model => Model.Projects.First().Enabled)</th>
+            </tr>
+            @foreach (Project proj in Model.Projects)
             {
-                <p>@project.Name</p>
+                <tr>
+                    <td>@Html.DisplayFor(_ => proj.Name)</td>
+                    <td>@Html.DisplayFor(_ => proj.Description)</td>
+                    <td>@Html.DisplayFor(_ => proj.Enabled)</td>
+                    <td>
+                        <a asp-page="/Project" asp-route-projectId="@proj.Id">View</a>
+                    </td>
+                    <td>
+                        <form method="post">
+                            <input type="hidden" name="projId" id="projId" value="@proj.Id"/>
+                            <button type="submit" asp-page-handler="RemoveProject">Remove</button>
+                        </form>
+                    </td>
+                </tr>
             }
-        </div>
+        </table>
     }
     else
     {
         <p>No Projects found please create a Project</p>
     }
 }
-
 <div class="modal" tabindex="-1" id="add-project-model">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Product Details</h5>
+                <h5 class="modal-title">Project Details</h5>
             </div>
             <div class="modal-body">
                 <form method="post" >

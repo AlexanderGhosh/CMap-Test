@@ -1,0 +1,79 @@
+﻿@page
+@using CMapTest.Models
+@model CMapTest.Pages.ProjectModel
+@{
+}
+
+<div>
+    <h1>Project: @Model.Project.Name</h1>
+    <hr/>
+    <dl>
+        <dt>
+            @Html.DisplayNameFor(m => m.Project.Id)
+        </dt>
+        <dd>
+            @Html.DisplayFor(m => m.Project.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(m => m.Project.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(m => m.Project.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(m => m.Project.Description)
+        </dt>
+        <dd>
+            @Html.DisplayFor(m => m.Project.Description)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(m => m.Project.Enabled)
+        </dt>
+        <dd>
+            @Html.DisplayFor(m => m.Project.Enabled)
+        </dd>
+    </dl>
+
+    <div>
+        <form method="post">
+            <input type="hidden" name="projectId" id="projectId" value ="@Model.Project.Id" />
+            <label for="searchUserId" class="control-label">User</label>
+            <select name="search.UserID" id="searchUserId" class="form-control" asp-items="@Model.SelecatbleUsers">
+                <option value="">-- Any --</option>
+            </select>
+            <label class="control-label" for="searchDateStart">Date Start</label>
+            <input type="date" name="search.DateStart" id="searchDateStart" class="form-control" />
+            <label class="control-label" for="searchDateEnd">Date End</label>
+            <input type="date" name="search.DateEnd" id="searchDateEnd" class="form-control" />
+            <div>                
+                <button input="submit" asp-page-handler="Search">Search</button>
+                <button input="reset" asp-page-handler="Clear">Clear Search</button>
+            </div>
+        </form>
+        <table class="table">
+            <tr>
+                <th>@Html.DisplayNameFor(m => m.Entries.First().Id)</th>
+                <th>@Html.DisplayNameFor(m => m.Entries.First().UserPreferName)</th>
+                <th>@Html.DisplayNameFor(m => m.Entries.First().Date)</th>
+                <th>@Html.DisplayNameFor(m => m.Entries.First().WorkingPeriod)</th>
+                <th>@Html.DisplayNameFor(m => m.Entries.First().Description)</th>
+            </tr>
+            @if (Model.Entries.Any())
+            {
+                foreach (EntryPretty entryPretty in Model.Entries)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(m => entryPretty.Id)</td>
+                        <td>@Html.DisplayFor(m => entryPretty.UserPreferName)</td>
+                        <td>@Html.DisplayFor(m => entryPretty.Date)</td>
+                        <td>@Html.DisplayFor(m => entryPretty.WorkingPeriod)</td>
+                        <td>@Html.DisplayFor(m => entryPretty.Description)</td>
+                    </tr>
+                }
+            }
+            else{
+                <h4>There are no entries for this project</h4>
+            }
+        </table>
+    </div>
+</div>

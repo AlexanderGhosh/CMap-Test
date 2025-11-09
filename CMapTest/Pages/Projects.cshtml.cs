@@ -5,22 +5,26 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace CMapTest.Pages
 {
-    public class ProjectsModel(IDataLayer _dataLayer) : PageModel
+    public class ProjectsModel(IProjectsDataLayer _projects) : PageModel
     {
-        public async Task<IEnumerable<Project>> GetAllProjects() => await _dataLayer.GetAllProjects(default);
-
-        public void OnGet()
+        public IEnumerable<Project> Projects { get; set; }
+        public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
         {
-        }
-        public void OnPost()
-        {
-            _ = 0;
+            cancellationToken.ThrowIfCancellationRequested();
+            Projects = await _projects.GetAllProjects(default);
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAddProjectAsync(Project project)
         {
-            await _dataLayer.CreateProject(project, default);
+            await _projects.CreateProject(project, default);
             return Redirect(Request.Path);
+        }
+
+        public async Task<IActionResult> OnPostRemoveProject(int projId)
+        {
+            await _projects.RemoveProject(projId, default);
+            return Page();
         }
     }
 }

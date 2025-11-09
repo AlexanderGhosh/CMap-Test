@@ -1,15 +1,9 @@
-﻿using CMapTest.Utils.Attributes;
-using System.Reflection;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
 namespace CMapTest.Utils
 {
     public static class Extensions
     {
-        extension(PropertyInfo property)
-        {
-            public string GetFormInputType() => property.GetCustomAttribute<FormInputTypeAttribute>()?.InputType ?? "text";
-        }
         extension(ClaimTypes)
         {
             public static string UserId => "CMapTest.ClaimTypes.UserId";

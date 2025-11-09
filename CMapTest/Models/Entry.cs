@@ -8,17 +8,19 @@ namespace CMapTest.Models
     public sealed class Entry
     {
         [Required]
-        public required int Id { get; set; }
+        public int Id { get; set; }
         [Required]
-        public required int UserId { get; init; }
+        public int UserId { get; set; }
         [Required]
-        public required int ProjectId { get; init; }
-        // I would use datetime so we store when they started without having to change this model
+        public int ProjectId { get; init; }
+
         [Required]
-        public required DateOnly Date { get; init; }
-        // I would use Timespan
+        public DateTime Date { get; init; }
         [Required]
-        public required float HoursWorked { get; init; }
+        public TimeOnly StartTime { get; init; }
+        [Required]
+        public TimeOnly EndTime { get; init; }
+        public TimeSpan TimeWorked => EndTime - StartTime;
         public string? Description { get; init; }
     }
 }

@@ -1,24 +1,77 @@
 ﻿@page
 @using CMapTest.Models
+@using CMapTest.Utils;
 @model CMapTest.Pages.EntriesModel
 @{
     ViewData["Title"] = "Entries";
 }
 
-<div>Hello i am entries</div>
-@{
-    var projects = await Model.GetAllProjects();
-    if (projects.Any())
+<p>Entries: <button class="btn" data-bs-toggle="modal" data-bs-target="#add-entry-model">Add</button></p>
+<table class="table">
+    <tr>
+        <th> 
+            @Html.DisplayNameFor(model => Model.Entries.First().UserPreferName)
+        </th>
+        <th> @Html.DisplayNameFor(model => Model.Entries.First().ProjectName)</th>
+        <th> @Html.DisplayNameFor(model => Model.Entries.First().Date)</th>
+        <th> @Html.DisplayNameFor(model => Model.Entries.First().WorkingPeriod)</th>
+        <th> @Html.DisplayNameFor(model => Model.Entries.First().Description)</th>
+    </tr>
+    @foreach (EntryPretty entry in Model.Entries)
     {
-        <select name="Project">
-            @foreach (Project project in projects)
-            {
-                <option value="project">project.Name</option>
-            }
-        </select>
+        <tr>
+            <td>@Html.DisplayFor(_ => entry.UserPreferName)</td>
+            <td>@Html.DisplayFor(_ => entry.ProjectName)</td>
+            <td>@Html.DisplayFor(_ => entry.Date)</td>
+            <td>@Html.DisplayFor(_ => entry.WorkingPeriod)</td>
+            <td>@Html.DisplayFor(_ => entry.Description)</td>
+            <td>
+                <form method="post">
+                    <input type="hidden" name="entryId" id="entryId" value="@entry.Id" />
+                    <button type="submit" asp-page-handler="RemoveEntry">Remove</button>
+                </form>
+            </td>
+        </tr>
     }
-    else
-    {
-        <p>No Projects found please create a Project <a>here</a></p>
-    }
-}
+</table>
+
+<div class="modal" tabindex="-1" id="add-entry-model">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Entry Details</h5>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    <div>
+                        <label asp-for="NewEntry.ProjectId" class="control-label">Project</label>
+                        <select asp-for="NewEntry.ProjectId" class="form-control" asp-items="@Model.ProjectNames">
+                            <option value="">Select a Project</option>
+                        </select>
+                        <span asp-validation-for="NewEntry.ProjectId" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <label asp-for="NewEntry.Date" class="control-label">Date</label>
+                        <input type="date" asp-for="NewEntry.Date" value="@DateTime.Today" class="form-control" />
+                        <span asp-validation-for="NewEntry.Date" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <label asp-for="NewEntry.StartTime" class="control-label">Start Time</label>
+                        <input type="time" asp-for="NewEntry.StartTime" class="form-control" />
+                        <span asp-validation-for="NewEntry.StartTime" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <label asp-for="NewEntry.EndTime" class="control-label">End Time</label>
+                        <input type="time" asp-for="NewEntry.EndTime" class="form-control" />
+                        <span asp-validation-for="NewEntry.EndTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-primary">Add</button>
+                        <button class="btn btn-secondary" type="reset" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

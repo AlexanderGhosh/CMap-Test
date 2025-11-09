@@ -24,13 +24,14 @@ namespace CMapTest
             // Add services to the container.
             builder.Services.AddRazorPages();
             builder.Services.Configure<AuthOptions>(builder.Configuration.GetRequiredSection("AuthOptions"));
+            builder.Services.AddSingleton<DataLayer>();
 #if DEBUG
-            builder.Services.AddSingleton<IDataLayer, DataLayer>();
+            builder.Services.AddSingleton<IDataLayer>(s => s.GetRequiredService<DataLayer>());
 #endif
-            builder.Services.AddSingleton<IAuthDataLayer, DataLayer>();
-            builder.Services.AddSingleton<IUserDataLayer, DataLayer>();
-            builder.Services.AddSingleton<IProjectsDataLayer, DataLayer>();
-            builder.Services.AddSingleton<IEntriesDataLayer, DataLayer>();
+            builder.Services.AddSingleton<IAuthDataLayer>(s => s.GetRequiredService<DataLayer>());
+            builder.Services.AddSingleton<IUserDataLayer>(s => s.GetRequiredService<DataLayer>());
+            builder.Services.AddSingleton<IProjectsDataLayer>(s => s.GetRequiredService<DataLayer>());
+            builder.Services.AddSingleton<IEntriesDataLayer>(s => s.GetRequiredService<DataLayer>());
 
             builder.Services.AddSingleton<IAuthService, AuthService>();
 

@@ -8,7 +8,7 @@ namespace CMapTest.Models
         public required int Id { get; set; }
         [Required]
         public required string Name { get; set; }
-        public bool Enabled { get; set; }
+        public bool Enabled { get; set; } = true;
         public string? Description { get; set; }
     }
 }

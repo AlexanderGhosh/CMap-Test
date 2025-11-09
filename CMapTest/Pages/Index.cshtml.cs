@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace CMapTest.Pages
 {
-    public class IndexModel(IDataLayer _dataLayer) : PageModel
+    public class IndexModel(IAuthDataLayer _authData) : PageModel
     {
 
         public void OnGet()
@@ -21,8 +21,8 @@ namespace CMapTest.Pages
             cancellationToken.ThrowIfCancellationRequested();
             try
             {
-                User user = await _dataLayer.LoginUser(request, cancellationToken);
-                IEnumerable<Claim> claims = await _dataLayer.GetUserClaims(user.Id, cancellationToken);
+                User user = await _authData.LoginUser(request, cancellationToken);
+                IEnumerable<Claim> claims = await _authData.GetUserClaims(user.Id, cancellationToken);
                 ClaimsIdentity identity = new(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
                 ClaimsPrincipal claimsPrincipal = new(identity);
@@ -40,7 +40,7 @@ namespace CMapTest.Pages
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                await _dataLayer.SignUpUser(signup, cancellationToken);
+                await _authData.SignUpUser(signup, cancellationToken);
                 return Redirect("/Entries");
             }
             catch (OperationFailedException)

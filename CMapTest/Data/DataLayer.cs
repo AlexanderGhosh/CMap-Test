@@ -11,7 +11,7 @@ namespace CMapTest.Data
 {
     // at work the data layer tends to call funcs from an other class for the DB work but in this case beacuse in mem storage is so simple im not gonna do that
     // but if i were in this case i would have some kind of IDataStorage which could be swapped for a DB implementation
-    public sealed class DataLayer(IAuthService _auth, IOptionsMonitor<AuthOptions> options) : IAuthDataLayer, IUserDataLayer, IProjectsDataLayer, IEntriesDataLayer
+    public sealed partial class DataLayer(IAuthService _auth, IOptionsMonitor<AuthOptions> options) : IAuthDataLayer, IUserDataLayer, IProjectsDataLayer
 #if DEBUG
         , IDataLayer
 #endif
@@ -19,15 +19,9 @@ namespace CMapTest.Data
         private readonly ConcurrentDictionary<string, AuthUser> _authUsers = [];
         private readonly ConcurrentDictionary<int, User> _users = [];
         private readonly ConcurrentDictionary<int, Project> _projects = [];
-        private readonly ConcurrentDictionary<int, Entry> _entries = [];
         private readonly ConcurrentBag<UserClaim> _userClaims = [];
         private AuthOptions _config => options.CurrentValue;
 
-        public Task<Entry> GetEntryFromId(int id, CancellationToken cancellationToken)
-        {
-            if (_entries.TryGetValue(id, out Entry? entry)) return Task.FromResult(entry);
-            throw new OperationFailedException("$Cannot find Entry with Id: {id}");
-        }
 
         public Task<Project> GetProjectFromId(int id, CancellationToken cancellationToken)
         {
@@ -42,28 +36,6 @@ namespace CMapTest.Data
         }
 
         public Task<IEnumerable<Project>> GetAllProjects(CancellationToken cancellationToken) => Task.FromResult(_projects.Select(vkp => vkp.Value));
-        public Task<IEnumerable<EntryPretty>> GetAllEntries(CancellationToken cancellationToken)
-        {
-            var entriesRaw = _entries.Select(vkp => vkp.Value);
-            var res = entriesRaw.Join(_users, e => e.Id, kvp => kvp.Key, (e, uKvp) => new EntryPretty()
-            {
-                Id = e.Id,
-                Date = DateOnly.FromDateTime(e.Date),
-                UserPreferName = uKvp.Value.PreferredName,
-                WorkingPeriod = $"{e.TimeWorked:hh}hrs {e.TimeWorked:mm}mins",
-                ProjectName = null,
-                Description = e.Description
-            });
-            res = res.Join(_projects, e => e.Id, kvp => kvp.Key, (e, pKvp) =>
-            {
-                e.ProjectName = pKvp.Value.Name;
-                return e;
-            });
-#if DEBUG
-            var tmp = res?.ToArray();
-#endif
-            return Task.FromResult(res ?? []);
-        }
         public Task<IEnumerable<User>> GetAllUsers(CancellationToken cancellationToken) => Task.FromResult(_users.Select(vkp => vkp.Value));
 
         public Task<Project> CreateProject(Project project, CancellationToken cancellationToken)
@@ -72,15 +44,6 @@ namespace CMapTest.Data
             project.Id = nextId(_projects);
             _projects.TryAdd(project.Id, project);
             return Task.FromResult(project);
-        }
-        public Task<Entry> CreateEntry(Entry entry, CancellationToken cancellationToken)
-        {
-            assertUserExists(entry.UserId);
-            assertProjectExists(entry.ProjectId);
-            if (isDuplicateEntry(entry)) throw new OperationFailedException("Cannot add duplicate entries");
-            entry.Id = nextId(_entries); // assigned to variable so i can debug easier if needed
-            _entries.TryAdd(entry.Id, entry);
-            return Task.FromResult(entry);
         }
         public Task<User> CreateUser(User user, CancellationToken cancellationToken)
         {
@@ -141,20 +104,20 @@ namespace CMapTest.Data
             _projects.TryRemove(id, out _);
             return Task.CompletedTask;
         }
-        public Task RemoveEntry(int id, CancellationToken cancellationToken)
-        {
-            assertEntryExists(id);
-            _entries.TryRemove(id, out _);
-            return Task.CompletedTask;
-        }
 
         public void Seed()
         {
             _users.TryAdd(0, new User()
             {
                 Id = 0,
-                FirstName = "test",
-                LastName = "test"
+                FirstName = "test user 0",
+                LastName = "test user 0"
+            });
+            _users.TryAdd(1, new User()
+            {
+                Id = 1,
+                FirstName = "test user 1",
+                LastName = "test user 1"
             });
             _authUsers.TryAdd("test", new AuthUser()
             {
@@ -190,6 +153,16 @@ namespace CMapTest.Data
                 EndTime = new TimeOnly(1, 0),
                 Description = "test entry description"
             });
+            _entries.TryAdd(1, new()
+            {
+                Id = 1,
+                UserId = 1,
+                ProjectId = 0,
+                Date = DateTime.Today.AddDays(1),
+                StartTime = new TimeOnly(0, 0),
+                EndTime = new TimeOnly(1, 0),
+                Description = "test entry description"
+            });
         }
 
 
@@ -212,12 +185,6 @@ namespace CMapTest.Data
         {
             if (!_projects.ContainsKey(projectId))
                 throw new OperationFailedException($"Cannot find Project with id {projectId}");
-        }
-
-        private void assertEntryExists(int entryId)
-        {
-            if (!_entries.ContainsKey(entryId))
-                throw new OperationFailedException($"Cannot find Entry with id {entryId}");
         }
     }
 }
