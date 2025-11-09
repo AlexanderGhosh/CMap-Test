@@ -10,7 +10,7 @@ namespace CMapTest.Data
         Task RemoveEntry(int id, CancellationToken cancellationToken);
         Task<EntryPretty> GetPretty(int id, CancellationToken cancellationToken);
 
-        Task<IEnumerable<Entry>> EntrySearch(EntrySearchContext search, CancellationToken cancellationToken);
+        Task<IEnumerable<Entry>> EntrySearch(EntrySearchContext? search, CancellationToken cancellationToken);
     }
     public sealed class EntrySearchContext
     {

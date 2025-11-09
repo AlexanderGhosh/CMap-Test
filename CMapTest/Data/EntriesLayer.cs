@@ -15,16 +15,15 @@ namespace CMapTest.Data
         public Task<IEnumerable<EntryPretty>> GetAllEntries(CancellationToken cancellationToken)
         {
             var entriesRaw = _entries.Values;
-            var res = entriesRaw.Join(_users, e => e.Id, kvp => kvp.Key, (e, uKvp) => new EntryPretty()
+            var res = entriesRaw.Join(_users, e => e.UserId, kvp => kvp.Key, (e, uKvp) => new EntryPretty()
             {
                 Id = e.Id,
                 Date = DateOnly.FromDateTime(e.Date),
                 UserPreferName = uKvp.Value.PreferredName,
                 WorkingPeriod = $"{e.TimeWorked:hh}hrs {e.TimeWorked:mm}mins",
-                ProjectName = null,
                 Description = e.Description
             });
-            res = res.Join(_projects, e => e.Id, kvp => kvp.Key, (e, pKvp) =>
+            res = res.Join(_projects, e => e.ProjectId, kvp => kvp.Key, (e, pKvp) =>
             {
                 e.ProjectName = pKvp.Value.Name;
                 return e;
@@ -75,8 +74,7 @@ namespace CMapTest.Data
         {
             cancellationToken.ThrowIfCancellationRequested();
             IEnumerable<Entry> res = _entries.Values;
-            if (search is null)
-                return Task.FromResult(res);
+            if (search is null) return Task.FromResult(res);
 
             if (search.UserId is not null)
                 res = res.Where(e => e.UserId == search.UserId);

@@ -11,7 +11,7 @@ namespace UnitTests.Data
         [Fact]
         public async Task CreateOneUser()
         {
-            IUserDataLayer users = mockDataLayer();
+            IUserDataLayer users = mockUserLayer();
 
             User creating = new User()
             {
@@ -36,7 +36,7 @@ namespace UnitTests.Data
         [Fact]
         public async Task CreateTwoUsers()
         {
-            IUserDataLayer users = mockDataLayer();
+            IUserDataLayer users = mockUserLayer();
 
             User creating1 = new User()
             {
@@ -78,9 +78,9 @@ namespace UnitTests.Data
 
         [Theory]
         [InlineData(-2), InlineData(-1), InlineData(0), InlineData(1), InlineData(2)]
-        public async Task MissingUser(int userId)
+        public async Task GetMissingUser(int userId)
         {
-            IUserDataLayer users = mockDataLayer();
+            IUserDataLayer users = mockUserLayer();
 
             await Assert.ThrowsAsync<OperationFailedException>(async () => await users.GetUserFromId(userId, default));
         }
@@ -88,7 +88,7 @@ namespace UnitTests.Data
         [Fact]
         public async Task GetAllNon()
         {
-            IUserDataLayer users = mockDataLayer();
+            IUserDataLayer users = mockUserLayer();
             var us = await users.GetAllUsers(default);
             Assert.NotNull(us);
             Assert.Empty(us);
@@ -97,7 +97,7 @@ namespace UnitTests.Data
         [Fact]
         public async Task GetAll2()
         {
-            IUserDataLayer users = mockDataLayer();
+            IUserDataLayer users = mockUserLayer();
 
             User creating1 = new User()
             {
@@ -125,7 +125,7 @@ namespace UnitTests.Data
         }
 
 
-        private IUserDataLayer mockDataLayer()
+        private IUserDataLayer mockUserLayer()
         {
             Mock<IServiceProvider> _servicesMock = new Mock<IServiceProvider>();
             IAuthService authMoc = Mock.Of<IAuthService>();
