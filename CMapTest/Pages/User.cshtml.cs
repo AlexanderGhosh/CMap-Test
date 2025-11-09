@@ -12,9 +12,11 @@ namespace CMapTest.Pages
     [Authorize]
     public class UserModel(IUserDataLayer _users, IEntriesDataLayer _entries) : PageModel
     {
-        public User User { get; set; }
+        public User AppUser { get; set; }
         public IEnumerable<EntryPretty> Entries { get; set; }
         public SelectList SelectableProjects { get; set; }
+        [BindProperty]
+        public Entry NewEntry { get; set; } = new();
         public async Task<IActionResult> OnGetAsync(EntrySearchContext? search, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -22,7 +24,7 @@ namespace CMapTest.Pages
             search.UserId = base.User.UserId;
             try
             {
-                User = await _users.GetUserFromId(search.UserId.Value, cancellationToken);
+                AppUser = await _users.GetUserFromId(search.UserId.Value, cancellationToken);
                 var entries = await _entries.EntrySearch(new EntrySearchContext() { UserId = search.UserId }, cancellationToken);
 
                 // search for all possible so that projects not included in the search still show up
@@ -38,6 +40,15 @@ namespace CMapTest.Pages
                 return NotFound();
             }
             return Page();
+        }
+
+        public async Task<IActionResult> OnPostAsync(EntrySearchContext? search, CancellationToken cancellationToken) => await OnGetAsync(search, cancellationToken);
+
+        public async Task<IActionResult> OnPostMakeEntryAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await _entries.CreateEntry(NewEntry, cancellationToken);
+            return await OnGetAsync(null, cancellationToken);
         }
 
         public async Task<IActionResult> OnPostSearch(EntrySearchContext search)

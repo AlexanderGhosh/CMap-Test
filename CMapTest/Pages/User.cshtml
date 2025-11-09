@@ -5,38 +5,38 @@
 }
 
 <div>
-    <h1>Hello: @Model.User.PreferredName</h1>
+    <h1>Hello: @Model.AppUser.PreferredName</h1>
     <hr />
     <dl>
         <dt>
-            @Html.DisplayNameFor(m => m.User.Id)
+            @Html.DisplayNameFor(m => m.AppUser.Id)
         </dt>
         <dd>
-            @Html.DisplayFor(m => m.User.Id)
+            @Html.DisplayFor(m => m.AppUser.Id)
         </dd>
         <dt>
-            @Html.DisplayNameFor(m => m.User.FirstName)
+            @Html.DisplayNameFor(m => m.AppUser.FirstName)
         </dt>
         <dd>
-            @Html.DisplayFor(m => m.User.FirstName)
+            @Html.DisplayFor(m => m.AppUser.FirstName)
         </dd>
         <dt>
-            @Html.DisplayNameFor(m => m.User.LastName)
+            @Html.DisplayNameFor(m => m.AppUser.LastName)
         </dt>
         <dd>
-            @Html.DisplayFor(m => m.User.LastName)
+            @Html.DisplayFor(m => m.AppUser.LastName)
         </dd>
         <dt>
-            @Html.DisplayNameFor(m => m.User.OtherNames)
+            @Html.DisplayNameFor(m => m.AppUser.OtherNames)
         </dt>
         <dd>
-            @Html.DisplayFor(m => m.User.OtherNames)
+            @Html.DisplayFor(m => m.AppUser.OtherNames)
         </dd>
     </dl>
 
     <div>
         <form method="post">
-            <input type="hidden" name="userId" id="userId" value="@Model.User.Id" />
+            <input type="hidden" name="userId" id="userId" value="@Model.AppUser.Id" />
             <label for="searchProjectId" class="control-label">Project</label>
             <select name="search.ProjectID" id="searchProjectId" class="form-control" asp-items="@Model.SelectableProjects">
                 <option value="">-- Any --</option>
@@ -46,17 +46,16 @@
             <label class="control-label" for="searchDateEnd">Date End</label>
             <input type="date" name="search.DateEnd" id="searchDateEnd" class="form-control" />
             <div>
-                <button input="submit" asp-page-handler="Search">Search</button>
-                <button input="reset" asp-page-handler="Clear">Clear Search</button>
-                <button input="reset" asp-page-handler="Clear">Make Entry</button>
+                <button type="submit" asp-page-handler="Search">Search</button>
+                <button type="submit" asp-page-handler="Clear">Clear Search</button>
+                <button type="button" data-bs-toggle="modal" data-bs-target="#add-entry-model">Make Entry</button>
             </div> 
         </form>
-        @if (Model.Entries.Any())
+        @if (Model.Entries is not null && Model.Entries.Any())
         {
             <table class="table">
                 <tr>
                     <th>@Html.DisplayNameFor(m => m.Entries.First().Id)</th>
-                    <th>@Html.DisplayNameFor(m => m.Entries.First().UserPreferName)</th>
                     <th>@Html.DisplayNameFor(m => m.Entries.First().Date)</th>
                     <th>@Html.DisplayNameFor(m => m.Entries.First().WorkingPeriod)</th>
                     <th>@Html.DisplayNameFor(m => m.Entries.First().Description)</th>
@@ -65,17 +64,63 @@
                 {
                     <tr>
                         <td>@Html.DisplayFor(m => entryPretty.Id)</td>
-                        <td>@Html.DisplayFor(m => entryPretty.UserPreferName)</td>
                         <td>@Html.DisplayFor(m => entryPretty.Date)</td>
                         <td>@Html.DisplayFor(m => entryPretty.WorkingPeriod)</td>
                         <td>@Html.DisplayFor(m => entryPretty.Description)</td>
                     </tr>
-                    }
+                }
             </table>
         }
         else
         {
             <h4>There are no entries for this user</h4>
         }
+    </div>
+</div>
+
+
+<div class="modal" tabindex="-1" id="add-entry-model">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Entry Details</h5>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    <div>
+                        <label asp-for="NewEntry.ProjectId" class="control-label">Project</label>
+                        <select asp-for="NewEntry.ProjectId" class="form-control" asp-items="@Model.SelectableProjects">
+                            <option value="">Select a Project</option>
+                        </select>
+                        <span asp-validation-for="NewEntry.ProjectId" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <label asp-for="NewEntry.Description" class="control-label">Description</label>
+                        <input type="text" asp-for="NewEntry.Description" value="" class="form-control" />
+                        <span asp-validation-for="NewEntry.Description" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <label asp-for="NewEntry.Date" class="control-label">Date</label>
+                        <input type="date" asp-for="NewEntry.Date" value="@DateTime.Today" class="form-control" />
+                        <span asp-validation-for="NewEntry.Date" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <label asp-for="NewEntry.StartTime" class="control-label">Start Time</label>
+                        <input type="time" asp-for="NewEntry.StartTime" class="form-control" />
+                        <span asp-validation-for="NewEntry.StartTime" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <label asp-for="NewEntry.EndTime" class="control-label">End Time</label>
+                        <input type="time" asp-for="NewEntry.EndTime" class="form-control" />
+                        <span asp-validation-for="NewEntry.EndTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" asp-page-handler="MakeEntry">Add</button>
+                        <button class="btn btn-secondary" type="reset" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>

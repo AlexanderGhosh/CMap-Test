@@ -11,11 +11,6 @@ namespace CMapTest.Pages
 {
     public class IndexModel(IAuthDataLayer _authData) : PageModel
     {
-
-        public void OnGet()
-        {
-            _ = 0;
-        }
         public async Task<IActionResult> OnPostLogin(LoginRequest request, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -27,7 +22,7 @@ namespace CMapTest.Pages
 
                 ClaimsPrincipal claimsPrincipal = new(identity);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
-                return Redirect("/Entries");
+                return Redirect("/User");
             }
             catch (Exception)
             {
@@ -41,7 +36,7 @@ namespace CMapTest.Pages
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 await _authData.SignUpUser(signup, cancellationToken);
-                return Redirect("/Entries");
+                return Redirect("/User");
             }
             catch (OperationFailedException)
             {
