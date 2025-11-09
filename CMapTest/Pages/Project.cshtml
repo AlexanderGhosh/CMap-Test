@@ -38,7 +38,7 @@
         <form method="post">
             <input type="hidden" name="projectId" id="projectId" value ="@Model.Project.Id" />
             <label for="searchUserId" class="control-label">User</label>
-            <select name="search.UserID" id="searchUserId" class="form-control" asp-items="@Model.SelecatbleUsers">
+            <select name="search.UserID" id="searchUserId" class="form-control" asp-items="@Model.SelectableUsers">
                 <option value="">-- Any --</option>
             </select>
             <label class="control-label" for="searchDateStart">Date Start</label>

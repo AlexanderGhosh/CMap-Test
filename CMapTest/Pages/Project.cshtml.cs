@@ -11,7 +11,7 @@ namespace CMapTest.Pages
     {
         public Project Project { get; set; }
         public IEnumerable<EntryPretty> Entries { get; set; }
-        public SelectList SelecatbleUsers { get; set; }
+        public SelectList SelectableUsers { get; set; }
         public async Task<IActionResult> OnGetAsync(int? projectId, EntrySearchContext? search, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -25,7 +25,7 @@ namespace CMapTest.Pages
 
                 // search for all posible so that users not included in the search still show up
                 Entries = entries.Select(e => _entries.GetPretty(e.Id, cancellationToken).Result);
-                SelecatbleUsers = new SelectList(Entries.DistinctBy(e => e.UserId), nameof(EntryPretty.UserId), nameof(EntryPretty.UserPreferName));
+                SelectableUsers = new SelectList(Entries.DistinctBy(e => e.UserId), nameof(EntryPretty.UserId), nameof(EntryPretty.UserPreferName));
 
                 // do the search again with the real filter
                 entries = await _entries.EntrySearch(search, cancellationToken);

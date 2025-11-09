@@ -1,0 +1,81 @@
+﻿@page
+@using CMapTest.Models
+@model CMapTest.Pages.UserModel
+@{
+}
+
+<div>
+    <h1>Hello: @Model.User.PreferredName</h1>
+    <hr />
+    <dl>
+        <dt>
+            @Html.DisplayNameFor(m => m.User.Id)
+        </dt>
+        <dd>
+            @Html.DisplayFor(m => m.User.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(m => m.User.FirstName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(m => m.User.FirstName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(m => m.User.LastName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(m => m.User.LastName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(m => m.User.OtherNames)
+        </dt>
+        <dd>
+            @Html.DisplayFor(m => m.User.OtherNames)
+        </dd>
+    </dl>
+
+    <div>
+        <form method="post">
+            <input type="hidden" name="userId" id="userId" value="@Model.User.Id" />
+            <label for="searchProjectId" class="control-label">Project</label>
+            <select name="search.ProjectID" id="searchProjectId" class="form-control" asp-items="@Model.SelectableProjects">
+                <option value="">-- Any --</option>
+            </select>
+            <label class="control-label" for="searchDateStart">Date Start</label>
+            <input type="date" name="search.DateStart" id="searchDateStart" class="form-control" />
+            <label class="control-label" for="searchDateEnd">Date End</label>
+            <input type="date" name="search.DateEnd" id="searchDateEnd" class="form-control" />
+            <div>
+                <button input="submit" asp-page-handler="Search">Search</button>
+                <button input="reset" asp-page-handler="Clear">Clear Search</button>
+                <button input="reset" asp-page-handler="Clear">Make Entry</button>
+            </div> 
+        </form>
+        @if (Model.Entries.Any())
+        {
+            <table class="table">
+                <tr>
+                    <th>@Html.DisplayNameFor(m => m.Entries.First().Id)</th>
+                    <th>@Html.DisplayNameFor(m => m.Entries.First().UserPreferName)</th>
+                    <th>@Html.DisplayNameFor(m => m.Entries.First().Date)</th>
+                    <th>@Html.DisplayNameFor(m => m.Entries.First().WorkingPeriod)</th>
+                    <th>@Html.DisplayNameFor(m => m.Entries.First().Description)</th>
+                </tr>
+                @foreach (EntryPretty entryPretty in Model.Entries)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(m => entryPretty.Id)</td>
+                        <td>@Html.DisplayFor(m => entryPretty.UserPreferName)</td>
+                        <td>@Html.DisplayFor(m => entryPretty.Date)</td>
+                        <td>@Html.DisplayFor(m => entryPretty.WorkingPeriod)</td>
+                        <td>@Html.DisplayFor(m => entryPretty.Description)</td>
+                    </tr>
+                    }
+            </table>
+        }
+        else
+        {
+            <h4>There are no entries for this user</h4>
+        }
+    </div>
+</div>

@@ -1,0 +1,53 @@
+using CMapTest.Data;
+using CMapTest.Exceptions;
+using CMapTest.Models;
+using CMapTest.Utils;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace CMapTest.Pages
+{
+    [Authorize]
+    public class UserModel(IUserDataLayer _users, IEntriesDataLayer _entries) : PageModel
+    {
+        public User User { get; set; }
+        public IEnumerable<EntryPretty> Entries { get; set; }
+        public SelectList SelectableProjects { get; set; }
+        public async Task<IActionResult> OnGetAsync(EntrySearchContext? search, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            search ??= new();
+            search.UserId = base.User.UserId;
+            try
+            {
+                User = await _users.GetUserFromId(search.UserId.Value, cancellationToken);
+                var entries = await _entries.EntrySearch(new EntrySearchContext() { UserId = search.UserId }, cancellationToken);
+
+                // search for all possible so that projects not included in the search still show up
+                Entries = entries.Select(e => _entries.GetPretty(e.Id, cancellationToken).Result);
+                SelectableProjects = new SelectList(Entries.DistinctBy(e => e.ProjectId), nameof(EntryPretty.Id), nameof(EntryPretty.ProjectName));
+
+                // do the search again with the real filter
+                entries = await _entries.EntrySearch(search, cancellationToken);
+                Entries = entries.Select(e => _entries.GetPretty(e.Id, cancellationToken).Result);
+            }
+            catch (OperationFailedException)
+            {
+                return NotFound();
+            }
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostSearch(EntrySearchContext search)
+        {
+            return await OnGetAsync(search, default);
+        }
+
+        public async Task<IActionResult> OnPostClear()
+        {
+            return await OnGetAsync(null, default);
+        }
+    }
+}
