@@ -4,7 +4,7 @@ using CMapTest.Utils;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-namespace CMapTest
+namespace CMapTest.Reports
 {
     public class DownloadableFile
     {

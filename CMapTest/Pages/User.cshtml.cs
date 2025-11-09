@@ -47,6 +47,9 @@ namespace CMapTest.Pages
         public async Task<IActionResult> OnPostMakeEntryAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            if (NewEntry.EndTime <= NewEntry.StartTime)
+                ModelState.AddModelError($"{nameof(NewEntry)}.{nameof(Entry.EndTime)}", "End time must be in the future of start time");
+            if (!ModelState.IsValid) return await OnGetAsync(null, default);
             await _entries.CreateEntry(NewEntry, cancellationToken);
             return await OnGetAsync(null, cancellationToken);
         }

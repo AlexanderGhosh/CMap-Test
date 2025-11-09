@@ -70,7 +70,13 @@ namespace CMapTest.Data
                 Description = "test entry description"
             });
         }
-        private static int nextId<T>(IEnumerable<T> c) => c.Count();
+        private static int nextId<T>(IEnumerable<T> c)
+        {
+            lock (c)
+            {
+                return c.Count();
+            }
+        }
 
     }
 }

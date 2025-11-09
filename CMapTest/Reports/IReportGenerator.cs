@@ -1,6 +1,6 @@
 ﻿using CMapTest.Utils;
 
-namespace CMapTest
+namespace CMapTest.Reports
 {
     public interface IReportGenerator
     {

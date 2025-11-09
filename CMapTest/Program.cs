@@ -1,6 +1,7 @@
 using CMapTest.Auth;
 using CMapTest.Config;
 using CMapTest.Data;
+using CMapTest.Reports;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace CMapTest

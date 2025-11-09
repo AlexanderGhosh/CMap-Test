@@ -79,13 +79,16 @@ namespace CMapTest.Auth
 
         private bool bitWiseComparison(byte[] a, byte[] b)
         {
-            int x = a.Length ^ b.Length; // should be 0 as in same length
+            int maxSize = Math.Max(a.Length, b.Length);
+            byte[] x = new byte[maxSize];
+            byte[] y = new byte[maxSize];
+            int z = 0;
             // doesn't have explicit early out so the attacker cant read much into it
             for (int i = 0; i < a.Length && i < b.Length; i++)
             {
-                x |= a[i] ^ b[i]; // are values in the same place
+                z |= a[i] ^ b[i]; // are values in the same place
             }
-            return x == 0;
+            return z == 0;
         }
     }
 }

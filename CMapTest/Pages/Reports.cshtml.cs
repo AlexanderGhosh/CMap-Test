@@ -1,5 +1,6 @@
 using CMapTest.Data;
 using CMapTest.Exceptions;
+using CMapTest.Reports;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;

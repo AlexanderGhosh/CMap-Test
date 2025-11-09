@@ -26,10 +26,12 @@ namespace CMapTest.Data
             _projects.TryRemove(id, out _);
             return Task.CompletedTask;
         }
-        private void assertProjectExists(int projectId)
+        private void assertProjectExists(int projectId, bool requireEnabled = true)
         {
-            if (!_projects.ContainsKey(projectId))
+            if (!_projects.TryGetValue(projectId, out Project? p))
                 throw new OperationFailedException($"Cannot find Project with id {projectId}");
+            else if (requireEnabled && !p.Enabled)
+                throw new OperationFailedException($"Project with id {projectId} is not enabled");
         }
     }
 }
