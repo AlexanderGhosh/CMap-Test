@@ -92,6 +92,16 @@ namespace CMapTest.Data
             return Task.FromResult(res);
         }
 
+
+        // doesnt consider working on multiple projects at the same time or overlapping time periods
+        private bool isDuplicateEntry(Entry candidate)
+        {
+            return _entries.Any(kvp =>
+            {
+                Entry e = kvp.Value;
+                return e.UserId == candidate.UserId && e.ProjectId == candidate.ProjectId && e.Date == candidate.Date;
+            });
+        }
         private void assertEntryExists(int entryId)
         {
             if (!_entries.ContainsKey(entryId))
