@@ -24,7 +24,14 @@ namespace CMapTest
             // Add services to the container.
             builder.Services.AddRazorPages();
             builder.Services.Configure<AuthOptions>(builder.Configuration.GetRequiredSection("AuthOptions"));
+#if DEBUG
             builder.Services.AddSingleton<IDataLayer, DataLayer>();
+#endif
+            builder.Services.AddSingleton<IAuthDataLayer, DataLayer>();
+            builder.Services.AddSingleton<IUserDataLayer, DataLayer>();
+            builder.Services.AddSingleton<IProjectsDataLayer, DataLayer>();
+            builder.Services.AddSingleton<IEntriesDataLayer, DataLayer>();
+
             builder.Services.AddSingleton<IAuthService, AuthService>();
 
             var app = builder.Build();
@@ -32,8 +39,10 @@ namespace CMapTest
             if (builder.Environment.IsDevelopment())
             {
                 // seeding
+#if DEBUG
                 IDataLayer data = app.Services.GetRequiredService<IDataLayer>();
                 data.Seed();
+#endif
             }
             // Configure the HTTP request pipeline.
             else
