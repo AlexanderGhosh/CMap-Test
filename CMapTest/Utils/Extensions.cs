@@ -25,8 +25,12 @@ namespace CMapTest.Utils
                 get
                 {
                     string? cValue = user.Claims.SingleOrDefault(c => c.Type == ClaimTypes.UserRole)?.Value;
-                    if (cValue is null) throw new InvalidOperationException("Cannot find User Id claim");
-                    return Enum.Parse<UserRole>(cValue);
+                    if (cValue is null)
+                    {
+                        _ = get_UserId(); // will throw if not valid user
+                        return UserRole.User;
+                    }
+                    return Enum.Parse<UserRole>(cValue, false);
                 }
             }
         }

@@ -1,10 +1,12 @@
 using CMapTest.Data;
 using CMapTest.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace CMapTest.Pages
 {
+    [Authorize(Policy = Policies.Admin)]
     public class ProjectsModel(IProjectsDataLayer _projects) : PageModel
     {
         public IEnumerable<Project> Projects { get; set; }

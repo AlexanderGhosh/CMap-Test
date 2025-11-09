@@ -43,6 +43,12 @@ namespace CMapTest.Data
                 Type = ClaimTypes.UserId,
                 Value = "0"
             });
+            _userClaims.Add(new UserClaim()
+            {
+                UserId = 0,
+                Type = ClaimTypes.UserRole,
+                Value = UserRole.Admin.ToString()
+            });
             _projects.TryAdd(0, new()
             {
                 Id = 0,

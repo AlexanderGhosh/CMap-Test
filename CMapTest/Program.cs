@@ -2,7 +2,9 @@ using CMapTest.Auth;
 using CMapTest.Config;
 using CMapTest.Data;
 using CMapTest.Reports;
+using CMapTest.Utils;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
 
 namespace CMapTest
 {
@@ -21,7 +23,13 @@ namespace CMapTest
                 o.ExpireTimeSpan = authOpt.CookieExpiry;
                 o.Validate();
             });
-            builder.Services.AddAuthorization();
+            builder.Services.AddAuthorization(o =>
+            {
+                o.AddPolicy("Admin", p =>
+                {
+                    p.RequireClaim(ClaimTypes.UserRole, UserRole.Admin.ToString());
+                });
+            });
             // Add services to the container.
             builder.Services.AddRazorPages();
             builder.Services.Configure<AuthOptions>(builder.Configuration.GetRequiredSection("AuthOptions"));

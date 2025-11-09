@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CMapTest.Pages
 {
-    [Authorize]
+    [Authorize(Policy = Policies.Admin)]
     public class EntriesModel(IEntriesDataLayer _entries, IProjectsDataLayer _projects, IUserDataLayer _users) : PageModel
     {
         [BindProperty]
