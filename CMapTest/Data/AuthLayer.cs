@@ -58,6 +58,7 @@ namespace CMapTest.Data
             };
             _authUsers.TryAdd(authUser.Username, authUser);
             _userClaims.Add(new UserClaim() { Type = ClaimTypes.UserId, Value = authUser.UserId.ToString(), UserId = authUser.UserId });
+            _userClaims.Add(new UserClaim() { Type = ClaimTypes.UserId, Value = UserRole.User.ToString(), UserId = authUser.UserId });
             return u;
         }
     }

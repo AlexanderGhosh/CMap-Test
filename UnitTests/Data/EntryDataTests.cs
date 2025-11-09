@@ -359,7 +359,7 @@ namespace UnitTests.Data
 
             var searchRes = await entries.EntrySearch(new EntrySearchContext()
             {
-                DateStart = DateOnly.FromDateTime(DateTime.Today.AddYears(1000))
+                DateStart = DateTime.Today.AddYears(1000)
             }, default);
             Assert.NotNull(searchRes);
             Assert.Empty(searchRes);
@@ -444,16 +444,16 @@ namespace UnitTests.Data
 
             searchRes = await entries.EntrySearch(new EntrySearchContext()
             {
-                DateStart = DateOnly.FromDateTime(DateTime.Today),
-                DateEnd = DateOnly.FromDateTime(DateTime.Today.AddDays(1))
+                DateStart = DateTime.Today,
+                DateEnd = DateTime.Today.AddDays(1)
             }, default);
             Assert.NotNull(searchRes);
             Assert.True(searchRes.Count() == 2);
 
             searchRes = await entries.EntrySearch(new EntrySearchContext()
             {
-                DateStart = DateOnly.FromDateTime(DateTime.Today),
-                DateEnd = DateOnly.FromDateTime(DateTime.Today)
+                DateStart = DateTime.Today,
+                DateEnd = DateTime.Today
             }, default);
             Assert.NotNull(searchRes);
             Assert.True(searchRes.Count() == 1);

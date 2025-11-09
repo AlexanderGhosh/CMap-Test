@@ -16,7 +16,7 @@ namespace CMapTest.Data
     {
         public int? ProjectId { get; set; }
         public int? UserId { get; set; }
-        public DateOnly? DateStart { get; set; }
-        public DateOnly? DateEnd { get; set; }
+        public DateTime? DateStart { get; set; }
+        public DateTime? DateEnd { get; set; }
     }
 }

@@ -18,9 +18,9 @@ namespace CMapTest.Data
             var res = entriesRaw.Join(_users, e => e.UserId, kvp => kvp.Key, (e, uKvp) => new EntryPretty()
             {
                 Id = e.Id,
-                Date = DateOnly.FromDateTime(e.Date),
+                Date = e.Date,
                 UserPreferName = uKvp.Value.PreferredName,
-                WorkingPeriod = $"{e.TimeWorked:hh}hrs {e.TimeWorked:mm}mins",
+                WorkingPeriod = e.TimeWorked,
                 Description = e.Description
             });
             res = res.Join(_projects, e => e.ProjectId, kvp => kvp.Key, (e, pKvp) =>
@@ -59,14 +59,13 @@ namespace CMapTest.Data
             return new EntryPretty
             {
                 Id = e.Id,
-                Date = DateOnly.FromDateTime(e.Date),
+                Date = e.Date,
                 UserPreferName = u.PreferredName,
-                WorkingPeriod = $"{e.TimeWorked:hh}hrs {e.TimeWorked:mm}mins",
                 ProjectName = p.Name,
                 Description = e.Description,
                 UserId = e.UserId,
                 ProjectId = e.ProjectId,
-                WorkingPeriodRaw = e.TimeWorked
+                WorkingPeriod = e.TimeWorked
             };
         }
 
@@ -83,10 +82,10 @@ namespace CMapTest.Data
                 res = res.Where(e => e.ProjectId == search.ProjectId);
 
             if (search.DateStart is not null)
-                res = res.Where(e => DateOnly.FromDateTime(e.Date) >= search.DateStart);
+                res = res.Where(e => e.Date >= search.DateStart);
 
             if (search.DateEnd is not null)
-                res = res.Where(e => DateOnly.FromDateTime(e.Date) <= search.DateEnd);
+                res = res.Where(e => e.Date <= search.DateEnd);
 
             return Task.FromResult(res);
         }

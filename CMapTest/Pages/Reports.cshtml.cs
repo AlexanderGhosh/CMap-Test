@@ -17,7 +17,7 @@ namespace CMapTest.Pages
             return Page();
         }
 
-        public async Task<IActionResult> OnPostUserReportAsync(int? userId, DateOnly? startDate, DateOnly? endDate, CancellationToken cancellationToken)
+        public async Task<IActionResult> OnPostUserReportAsync(int? userId, DateTime? startDate, DateTime? endDate, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (userId is null) ModelState.AddModelError(nameof(userId), "User id must not be null");

@@ -17,7 +17,7 @@ namespace CMapTest.Reports
     }
     public class ReportGenerator(IUserDataLayer _users, IEntriesDataLayer _entries) : IReportGenerator
     {
-        public async Task<DownloadableFile> GenerateUserReport(int userId, DateRange range, CancellationToken cancellationToken)
+        public async Task<DownloadableFile> GenerateUserReport(int userId, DateTimeRange range, CancellationToken cancellationToken)
         {
             User user = await _users.GetUserFromId(userId, cancellationToken);
             IEnumerable<Entry> entriesRaw = await _entries.EntrySearch(new()
@@ -47,7 +47,7 @@ namespace CMapTest.Reports
                     }
                     builder.AppendFormat("Date: {0} | Time worked: {1} | Description: {2}", entry.Date, entry.WorkingPeriod, entry.Description ?? "N/A").AppendLine();
                 }
-                builder.AppendFormat("Total time worked: {0}", group.Select(e => e.WorkingPeriodRaw).Aggregate((a, b) => a + b));
+                builder.AppendFormat("Total time worked: {0}", group.Select(e => e.WorkingPeriod).Aggregate((a, b) => a + b));
             }
 
             using MemoryStream stream = new();

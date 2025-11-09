@@ -15,7 +15,7 @@
         }
 
         public bool IsAdequate { get; }
-        public string? FailedReason => IsAdequate ? throw new InvalidOperationException($"Cannot get {FailedReason} because it didn't fail") : field;
+        public string? FailedReason => IsAdequate ? throw new InvalidOperationException($"Cannot get {nameof(FailedReason)} because it didn't fail") : field;
         public static PasswordStrengthResult Pass() => new(true);
         public static PasswordStrengthResult Fail(string? why) => new(false, why);
     }

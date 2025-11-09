@@ -5,27 +5,28 @@ using System.Text;
 
 namespace CMapTest.Auth
 {
-    public sealed class AuthService(IOptionsMonitor<AuthOptions> options) : IAuthService
+    public sealed class AuthService(IOptionsMonitor<AuthOptions> options) : IAuthService, IDisposable
     {
         // i know this defaults to the named option "". I dont think its likely that a dev would add multiple PasswordOptions options and at some point its not worth accounting for dev error
         private AuthOptions _config => options.CurrentValue;
+        private readonly HashAlgorithm _hasher = MD5.Create();
         // at work i wrote a similar function to return a list of all the errors but i felt that it was a valid compromise to not do that so i can get this project done faster
         // it would take more time to manage multiple fail reasons at once because i would have to make a component to present them nicely which can be a can of worms
-        public async Task<PasswordStrengthResult> IsPasswordStrongEnough(string plainPassword, CancellationToken cancellationToken)
+        public Task<PasswordStrengthResult> IsPasswordStrongEnough(string plainPassword, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await Task.Yield();
+            PasswordStrengthResult res = PasswordStrengthResult.Pass();
             if (!_config.PasswordLength.InRange(plainPassword.Length))
-                return PasswordStrengthResult.Fail($"Your password's length must be in the range: {_config.PasswordLength}");
-            if (!_config.PasswordLowerCase.InRange(plainPassword.Count(char.IsLower)))
-                return PasswordStrengthResult.Fail($"Your password's lower case characters must be in the range: {_config.PasswordLowerCase}");
-            if (!_config.PasswordUpperCase.InRange(plainPassword.Count(char.IsUpper)))
-                return PasswordStrengthResult.Fail($"Your password's upper case characters must be in the range: {_config.PasswordUpperCase}");
-            if (!_config.PasswordDigits.InRange(plainPassword.Count(char.IsDigit)))
-                return PasswordStrengthResult.Fail($"Your password must contains a number of digits in the range: {_config.PasswordDigits}");
-            if (!_config.AllowNonAlphaNumeric && plainPassword.All(char.IsLetterOrDigit))
-                return PasswordStrengthResult.Fail($"Your password must only contains a letters or numerical digits");
-            return PasswordStrengthResult.Pass();
+                res = PasswordStrengthResult.Fail($"Your password's length must be in the range: {_config.PasswordLength}");
+            else if (!_config.PasswordLowerCase.InRange(plainPassword.Count(char.IsLower)))
+                res = PasswordStrengthResult.Fail($"Your password's lower case characters must be in the range: {_config.PasswordLowerCase}");
+            else if (!_config.PasswordUpperCase.InRange(plainPassword.Count(char.IsUpper)))
+                res = PasswordStrengthResult.Fail($"Your password's upper case characters must be in the range: {_config.PasswordUpperCase}");
+            else if (!_config.PasswordDigits.InRange(plainPassword.Count(char.IsDigit)))
+                res = PasswordStrengthResult.Fail($"Your password must contains a number of digits in the range: {_config.PasswordDigits}");
+            else if (!_config.AllowNonAlphaNumeric && plainPassword.All(char.IsLetterOrDigit))
+                res = PasswordStrengthResult.Fail($"Your password must only contains a letters or numerical digits");
+            return Task.FromResult(res);
         }
 
         public Task<bool> VerifyPassword(string plainPassword, byte[] exceptedHash, CancellationToken cancellationToken)
@@ -60,8 +61,7 @@ namespace CMapTest.Auth
             Buffer.BlockCopy(salt, 0, saltData, 0, salt.Length);
             Buffer.BlockCopy(data, 0, saltData, salt.Length, data.Length);
             // saltData = [..salt, ..data]
-            using SHA256 hasher = SHA256.Create();
-            byte[] saltDataHash = hasher.ComputeHash(saltData);
+            byte[] saltDataHash = _hasher.ComputeHash(saltData);
             byte[] saltHash = new byte[salt.Length + saltDataHash.Length];
             Buffer.BlockCopy(salt, 0, saltHash, 0, salt.Length);
             Buffer.BlockCopy(saltDataHash, 0, saltHash, salt.Length, saltDataHash.Length);
@@ -71,24 +71,27 @@ namespace CMapTest.Auth
 
         private byte[] getSalt()
         {
-            using RandomNumberGenerator rng = RandomNumberGenerator.Create();
             byte[] salt = new byte[_config.SaltLength];
-            rng.GetBytes(salt, 0, _config.SaltLength);
+            RandomNumberGenerator.Fill(salt);
             return salt;
         }
 
         private bool bitWiseComparison(byte[] a, byte[] b)
         {
-            int maxSize = Math.Max(a.Length, b.Length);
-            byte[] x = new byte[maxSize];
-            byte[] y = new byte[maxSize];
-            int z = 0;
-            // doesn't have explicit early out so the attacker cant read much into it
-            for (int i = 0; i < a.Length && i < b.Length; i++)
-            {
-                z |= a[i] ^ b[i]; // are values in the same place
-            }
-            return z == 0;
+            return CryptographicOperations.FixedTimeEquals(a, b);
+            // made this func before i knew about CryptographicOperations.FixedTimeEquals
+            //int maxSize = Math.Max(a.Length, b.Length);
+            //byte[] x = new byte[maxSize];
+            //byte[] y = new byte[maxSize];
+            //int z = 0;
+            //// doesn't have explicit early out so the attacker cant read much into it
+            //for (int i = 0; i < a.Length && i < b.Length; i++)
+            //{
+            //    z |= a[i] ^ b[i]; // are values in the same place
+            //}
+            //return z == 0;
         }
+
+        public void Dispose() => _hasher.Dispose();
     }
 }

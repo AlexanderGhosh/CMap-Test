@@ -15,7 +15,7 @@ namespace CMapTest
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(o =>
             {
-                o.LoginPath = new PathString("/Error"); // caused redirect to login page
+                o.LoginPath = new PathString("/Index"); // caused redirect to login page
                 AuthOptions authOpt = builder.Configuration.GetRequiredSection("AuthOptions").Get<AuthOptions>()!;
                 o.Cookie.Name = CookieAuthenticationDefaults.AuthenticationScheme;
                 o.ExpireTimeSpan = authOpt.CookieExpiry;

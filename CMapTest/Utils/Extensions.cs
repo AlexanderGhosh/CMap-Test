@@ -6,6 +6,7 @@ namespace CMapTest.Utils
     {
         extension(ClaimTypes)
         {
+            public static string UserRole => "CMapTest.ClaimTypes.UserRole";
             public static string UserId => "CMapTest.ClaimTypes.UserId";
         }
         extension(ClaimsPrincipal user)
@@ -17,6 +18,15 @@ namespace CMapTest.Utils
                     string? cValue = user.Claims.SingleOrDefault(c => c.Type == ClaimTypes.UserId)?.Value;
                     if (cValue is null) throw new InvalidOperationException("Cannot find User Id claim");
                     return int.Parse(cValue);
+                }
+            }
+            public UserRole UserRole
+            {
+                get
+                {
+                    string? cValue = user.Claims.SingleOrDefault(c => c.Type == ClaimTypes.UserRole)?.Value;
+                    if (cValue is null) throw new InvalidOperationException("Cannot find User Id claim");
+                    return Enum.Parse<UserRole>(cValue);
                 }
             }
         }

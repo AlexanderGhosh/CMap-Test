@@ -14,5 +14,5 @@
     }
 
     public class IntRange(int? min = null, int? max = null) : Range<int>(min, max);
-    public class DateRange(DateOnly? min = null, DateOnly? max = null) : Range<DateOnly>(min, max);
+    public class DateTimeRange(DateTime? min = null, DateTime? max = null) : Range<DateTime>(min, max);
 }

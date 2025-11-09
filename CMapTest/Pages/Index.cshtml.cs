@@ -13,6 +13,15 @@ namespace CMapTest.Pages
     {
         [BindProperty]
         public SignupUser Signup { get; set; } = new();
+        public IActionResult OnGet()
+        {
+            if (User.Identity?.IsAuthenticated ?? false)
+            {
+                return Redirect("/User");
+            }
+            return Page();
+        }
+
         public async Task<IActionResult> OnPostLogin(LoginRequest request, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -34,10 +43,10 @@ namespace CMapTest.Pages
 
         public async Task<IActionResult> OnPostSignup(CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (!ModelState.IsValid) return Redirect(Request.Path);
             try
             {
-                cancellationToken.ThrowIfCancellationRequested();
                 await _authData.SignUpUser(Signup, cancellationToken);
                 return Redirect("/User");
             }
