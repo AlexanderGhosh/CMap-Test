@@ -48,7 +48,6 @@ namespace CMapTest.Data
             _entries.TryRemove(id, out _);
             return Task.CompletedTask;
         }
-
         public async Task<EntryPretty> GetPretty(int id, CancellationToken cancellationToken)
         {
             assertEntryExists(id);
@@ -68,7 +67,6 @@ namespace CMapTest.Data
                 WorkingPeriod = e.TimeWorked
             };
         }
-
         public Task<IEnumerable<Entry>> EntrySearch(EntrySearchContext? search, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -88,6 +86,12 @@ namespace CMapTest.Data
                 res = res.Where(e => e.Date <= search.DateEnd);
 
             return Task.FromResult(res);
+        }
+        public Task UpdateEntry(Entry entry, CancellationToken cancellationToken)
+        {
+            assertEntryExists(entry.Id);
+            _entries.AddOrUpdate(entry.Id, entry, (key, oldValue) => entry);
+            return Task.CompletedTask;
         }
 
 

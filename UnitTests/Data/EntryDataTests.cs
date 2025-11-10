@@ -458,6 +458,61 @@ namespace UnitTests.Data
             Assert.NotNull(searchRes);
             Assert.True(searchRes.Count() == 1);
         }
+        [Fact]
+        public async Task UpdateEntry()
+        {
+            IEntriesDataLayer entries = mockEntryLayer();
+            IUserDataLayer users = mockUserLayer();
+            IProjectsDataLayer projects = mockProjectLayer();
+            Entry creating = new()
+            {
+                Id = -1,
+                UserId = 0,
+                ProjectId = 0,
+                Description = "Test D 1",
+                StartTime = TimeOnly.FromDateTime(DateTime.Now),
+                EndTime = TimeOnly.FromDateTime(DateTime.Now).AddHours(1),
+                Date = DateTime.Today
+            };
+            await assertUserCreation(users, new User()
+            {
+                Id = -1,
+                FirstName = "Test FN",
+                LastName = "Test LN",
+                OtherNames = "Test ON",
+                PreferredName = "Test PN"
+            }, default);
+            await assertProjectCreation(projects, new Project()
+            {
+                Id = -1,
+                Name = "Test N 1",
+                Description = "Test D 1",
+                Enabled = true
+            }, default);
+            Entry created = await assertEntryCreation(entries, creating, 0);
+            Entry updated = new()
+            {
+                Id = 0,
+                UserId = 0,
+                ProjectId = 0,
+                Description = "Test D 2",
+                StartTime = TimeOnly.FromDateTime(DateTime.Now),
+                EndTime = TimeOnly.FromDateTime(DateTime.Now).AddHours(1),
+                Date = DateTime.Today
+            };
+            await entries.UpdateEntry(updated, default);
+            Entry gotton = await entries.GetEntryFromId(created.Id, default);
+
+            Assert.NotNull(gotton);
+
+            Assert.Equal(updated.Id, gotton.Id);
+            Assert.Equal(updated.UserId, gotton.UserId);
+            Assert.Equal(updated.ProjectId, gotton.ProjectId);
+            Assert.Equal(updated.Description, gotton.Description);
+            Assert.Equal(updated.StartTime, gotton.StartTime);
+            Assert.Equal(updated.EndTime, gotton.EndTime);
+            Assert.Equal(updated.Date, gotton.Date);
+        }
 
         private IUserDataLayer mockUserLayer()
         {
